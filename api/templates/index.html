@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raghad</title>
+    <style>
+        html {
+            min-height: 100%;
+        }
+
+        * {
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        label {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        select, input[type="submit"] {
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #000000;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.7rem top 50%;
+            background-size: 0.65rem auto;
+            padding-right: 2rem;
+        }
+
+        select:hover, input[type="submit"]:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        input[type="submit"] {
+            cursor: pointer;
+            background: linear-gradient(45deg, #00ffff, #00bfff);
+            color: #000000;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: #ffffff;
+            text-decoration: none;
+            display: block;
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(10px);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                width: 100%;
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const seasonSelect = document.getElementById('season');
+        const episodeList = document.getElementById('episodes');
+
+        seasonSelect.addEventListener('change', function() {
+            fetch('/get_episodes?season=' + encodeURIComponent(this.value))
+                .then(response => response.json())
+                .then(data => {
+                    episodeList.innerHTML = '';
+                    data.episode_links.forEach(episode => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = '/fetch_episode?episode_link=' + encodeURIComponent(episode.link);
+                        a.textContent = episode.title;
+                        li.appendChild(a);
+                        episodeList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching episodes:', error);
+                });
+        });
+
+        // Trigger change on page load to load default season
+        seasonSelect.dispatchEvent(new Event('change'));
+    });
+</script>
+</head>
+<body>
+<div class="container">
+    <h1>الحلقات</h1>
+    <label for="season">اختر الموسم: </label>
+    <select name="season" id="season">
+        <option value="الاول" selected>الاول</option>
+        <option value="الثاني">الثاني</option>
+        <option value="الثالث">الثالث</option>
+    </select>
+    <ul id="episodes">
+        <!-- Episodes will be loaded here -->
+    </ul>
+</div>
+</body>
+
+    <script type="text/javascript" src="https://us-assets.i.posthog.com/static/recorder.js?v=1.170.1"></script>
+</body>
+</html>
